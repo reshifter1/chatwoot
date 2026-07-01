@@ -54,6 +54,14 @@ export default {
       );
     },
     onFileUpload(file) {
+      // Stamp a monotonic sequence in selection order. `@input-file` fires
+      // once per file in the order the agent picked them, but uploads finish
+      // (and thus attach) out of order, so attachedFiles ends up ordered by
+      // upload speed. attachFile() sorts by this to restore selection order.
+      if (file) {
+        this.fileUploadSeq = (this.fileUploadSeq || 0) + 1;
+        file.uploadSeq = this.fileUploadSeq;
+      }
       if (this.globalConfig.directUploadsEnabled) {
         this.onDirectFileUpload(file);
       } else {

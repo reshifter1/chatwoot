@@ -1051,7 +1051,14 @@ export default {
           thumb: reader.result,
           blobSignedId: blob ? blob.signed_id : undefined,
           isVoiceMessage: file?.isVoiceMessage || false,
+          uploadSeq: file?.uploadSeq,
         });
+        // Keep attachments in the order the agent picked them (uploadSeq),
+        // not the order their parallel uploads happened to finish. Fixes both
+        // the compose-box preview and the sent order for batch image uploads.
+        this.attachedFiles.sort(
+          (a, b) => (a.uploadSeq ?? 0) - (b.uploadSeq ?? 0)
+        );
       };
     },
     removeAttachment(attachments) {
