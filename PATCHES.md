@@ -27,8 +27,21 @@ array order = upload speed.
   order).
 - `app/javascript/dashboard/components/widgets/conversation/ReplyBox.vue` -
   `attachFile` stores `uploadSeq` and sorts `attachedFiles` by it after each
-  push, restoring selection order for both the compose-box preview and the sent
-  payload.
+  push, restoring selection order for the sent payload.
+
+### Follow-up: compose-box preview order
+
+The `uploadSeq` sort fixed the sent payload, but the compose-box preview
+(`AttachmentsPreview.vue`) still showed upload-completion order. Its `v-for`
+keys each row by `attachment.id`, and the objects `attachFile` pushed had no
+`id` - so every row keyed by `undefined`, i.e. an unkeyed list. Vue patches
+unkeyed lists by index, so an in-place `.sort()` of the same array reference did
+not reorder the rendered thumbnails (the payload, which reads the array
+directly, was already correct - hence "right in Telegram, wrong in the
+preview"). Fix: `attachFile` now also stamps `id: file?.uploadSeq` on each
+pushed object, giving the preview a stable unique key so it follows the sorted
+order. Guarded by `AttachmentsPreview.spec.js` (in-place-sort reproduction) plus
+a monotonic-`uploadSeq` test in `fileUploadMixin.spec.js`.
 
 ## Build / publish
 

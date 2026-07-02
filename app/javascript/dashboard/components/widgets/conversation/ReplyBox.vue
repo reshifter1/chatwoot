@@ -1045,6 +1045,12 @@ export default {
       reader.readAsDataURL(file.file);
       reader.onloadend = () => {
         this.attachedFiles.push({
+          // Stable unique key for the AttachmentsPreview v-for. Without it every
+          // row keys by `undefined` (an unkeyed list), so Vue patches by index
+          // and the preview keeps upload-completion order after the sort below,
+          // even though the sent payload is correctly ordered. Reuse uploadSeq -
+          // it is monotonic and unique per file within the composer session.
+          id: file?.uploadSeq,
           currentChatId: this.currentChat.id,
           resource: blob || file,
           isPrivate: this.isPrivate,

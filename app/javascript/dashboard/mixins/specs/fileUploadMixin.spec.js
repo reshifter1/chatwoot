@@ -62,14 +62,36 @@ describe('FileUploadMixin', () => {
   it('should call onDirectFileUpload when direct uploads are enabled', () => {
     wrapper.vm.onDirectFileUpload = vi.fn();
     wrapper.vm.onFileUpload({});
-    expect(wrapper.vm.onDirectFileUpload).toHaveBeenCalledWith({});
+    expect(wrapper.vm.onDirectFileUpload).toHaveBeenCalledWith(
+      expect.objectContaining({ uploadSeq: expect.any(Number) })
+    );
   });
 
   it('should call onIndirectFileUpload when direct uploads are disabled', () => {
     wrapper.vm.globalConfig.directUploadsEnabled = false;
     wrapper.vm.onIndirectFileUpload = vi.fn();
     wrapper.vm.onFileUpload({});
-    expect(wrapper.vm.onIndirectFileUpload).toHaveBeenCalledWith({});
+    expect(wrapper.vm.onIndirectFileUpload).toHaveBeenCalledWith(
+      expect.objectContaining({ uploadSeq: expect.any(Number) })
+    );
+  });
+
+  it('stamps a monotonic uploadSeq in selection order on each file', () => {
+    // @input-file fires once per file in the order the agent picked them, so
+    // onFileUpload stamps a strictly increasing uploadSeq. attachFile later
+    // sorts by it (and keys the preview by it) to undo the out-of-order arrival
+    // of parallel uploads. Uniqueness/monotonicity here is what that relies on.
+    wrapper.vm.onDirectFileUpload = vi.fn();
+    const first = {};
+    const second = {};
+    const third = {};
+    wrapper.vm.onFileUpload(first);
+    wrapper.vm.onFileUpload(second);
+    wrapper.vm.onFileUpload(third);
+
+    expect(first.uploadSeq).toBe(1);
+    expect(second.uploadSeq).toBe(2);
+    expect(third.uploadSeq).toBe(3);
   });
 
   describe('onDirectFileUpload', () => {
