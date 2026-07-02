@@ -130,7 +130,13 @@ class Message < ApplicationRecord
   belongs_to :conversation
   belongs_to :sender, polymorphic: true, optional: true
 
-  has_many :attachments, dependent: :destroy, autosave: true, before_add: :validate_attachments_limit
+  # Order by :id so every consumer (dashboard serializer, realtime push_event_data,
+  # outgoing webhooks) renders attachments deterministically. Attachment ids ascend
+  # in the order MessageBuilder#process_attachments builds them, i.e. the order the
+  # files were sent. Without an ORDER BY, Postgres returns them in an arbitrary order,
+  # so the sent-message bubble showed images shuffled even though delivery order was
+  # correct (bit&pix fork patch - see PATCHES.md).
+  has_many :attachments, -> { order(:id) }, dependent: :destroy, autosave: true, before_add: :validate_attachments_limit
   has_one :csat_survey_response, dependent: :destroy_async
   has_many :notifications, as: :primary_actor, dependent: :destroy_async
 

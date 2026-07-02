@@ -16,6 +16,27 @@ RSpec.describe Message do
     it { is_expected.to validate_presence_of(:account_id) }
   end
 
+  # bit&pix fork: the attachments association must carry a deterministic ORDER BY
+  # id so the sent-message bubble (and the outgoing webhook the Telegram gateway
+  # reads) render images in send order. Without it Postgres returns an arbitrary
+  # order and multi-image messages showed up shuffled. See PATCHES.md.
+  describe 'attachments ordering' do
+    let(:message) { create(:message) }
+
+    it 'reads attachments with an explicit ORDER BY id' do
+      expect(message.attachments.to_sql).to match(/ORDER BY.+"attachments"\."id"/i)
+    end
+
+    it 'returns attachments in ascending id order' do
+      message.attachments.create!(account_id: message.account_id, file_type: :image, external_url: 'https://example.com/a.jpg')
+      message.attachments.create!(account_id: message.account_id, file_type: :image, external_url: 'https://example.com/b.jpg')
+      message.attachments.create!(account_id: message.account_id, file_type: :image, external_url: 'https://example.com/c.jpg')
+
+      ids = message.reload.attachments.map(&:id)
+      expect(ids).to eq(ids.sort)
+    end
+  end
+
   describe 'length validations' do
     let!(:message) { create(:message) }
 

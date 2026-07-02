@@ -43,6 +43,30 @@ pushed object, giving the preview a stable unique key so it follows the sorted
 order. Guarded by `AttachmentsPreview.spec.js` (in-place-sort reproduction) plus
 a monotonic-`uploadSeq` test in `fileUploadMixin.spec.js`.
 
+## Patch: deterministic attachment order in sent messages
+
+**Problem:** even after the compose-box fix above, a sent multi-image message
+rendered its thumbnails shuffled in the conversation bubble - while delivery to
+Telegram stayed correct. "Right in Telegram, right in the compose box, wrong once
+the message is created."
+
+**Root cause:** `Message has_many :attachments` had no `ORDER BY`, so Postgres
+returned attachments in an arbitrary order. The dashboard serializer
+(`message.attachments.map(&:push_event_data)`), the realtime push, and later
+`GET` requests could each get a different order for the same message. Verified on
+prod: for message 165 the unordered association returned attachment ids
+`[193, 192, 190, 191]` while `order(:id)` returned `[190, 191, 192, 193]` - and id
+order matches `created_at`, blob id, and the send order (attachments are built in
+`MessageBuilder#process_attachments` in the sent `files[]` order, so their serial
+ids ascend in send order).
+
+**Fix (1 file):**
+- `app/models/message.rb` - scope the association: `has_many :attachments,
+  -> { order(:id) }, ...`. One place fixes every consumer (bubble serializer,
+  push, outgoing webhook the Telegram gateway reads).
+
+Guarded by an ordering test in `spec/models/message_spec.rb`.
+
 ## Build / publish
 
 CI: `.github/workflows/build-patched-image.yml` builds `docker/Dockerfile`

@@ -16,8 +16,13 @@ on:
     branches:
       - bitandpix-4.15.1
     paths:
-      - "app/javascript/dashboard/mixins/fileUploadMixin.js"
-      - "app/javascript/dashboard/components/widgets/conversation/ReplyBox.vue"
+      # Any patched source rebuilds the image. Kept broad on purpose: this branch
+      # only ever carries our own patches (we do NOT track upstream), so app/lib
+      # changes here are always ours and always want a rebuild. Non-shipping paths
+      # (spec/, docs) are intentionally excluded.
+      - "app/**"
+      - "lib/**"
+      - "config/**"
       - "docker/Dockerfile"
       - ".github/workflows/build-patched-image.yml"
   workflow_dispatch:
