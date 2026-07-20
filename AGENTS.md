@@ -111,3 +111,15 @@ Practical checklist for any change impacting core logic or public APIs
 ## Branding / White-labeling note
 
 - For user-facing strings that currently contain "Chatwoot" but should adapt to branded/self-hosted installs, prefer applying `replaceInstallationName` from `shared/composables/useBranding` in the UI layer (for example tooltip and suggestion labels) instead of adding hardcoded brand-specific copy.
+
+## Сабагенты и ресёрч
+
+- **Гуглить/искать документацию — через сабагентов**, но ТОЛЬКО типом `Explore`: у него в
+  наборе всё, кроме `Agent`, поэтому он физически не может наспавнить своих подагентов.
+  Тип `general-purpose` для ресёрча НЕ использовать: у него тулы `*`, включая `Agent`, и на
+  широкий промпт он разворачивает веер на десятки агентов.
+- **Промпт ресёрча узкий:** не больше 3-4 кандидатов/вопросов за вызов. Список из 12
+  пунктов агент читает как приглашение распараллелить по пункту на агента.
+- **Одновременно не больше 7 ресёрч-агентов.** Нужно больше - спросить разрешение.
+- **`Workflow` (мультиагентная оркестрация) не запускать без явной просьбы пользователя** -
+  он рассчитан на десятки агентов и сжигает бюджет.
