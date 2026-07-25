@@ -115,6 +115,15 @@ Practical checklist for any change impacting core logic or public APIs
 
 - For user-facing strings that currently contain "Chatwoot" but should adapt to branded/self-hosted installs, prefer applying `replaceInstallationName` from `shared/composables/useBranding` in the UI layer (for example tooltip and suggestion labels) instead of adding hardcoded brand-specific copy.
 
+## Форк: гайдлайны только в CLAUDE.md
+
+- Апстримовый `AGENTS.md` (он есть в оригинальном chatwoot, например в теге `v4.15.1`) в
+  этом форке удалён намеренно. Единственный файл гайдлайнов - `CLAUDE.md`: это бывшее
+  содержимое `AGENTS.md` плюс наши секции. Симлинка `CLAUDE.md -> AGENTS.md` больше нет.
+- Из-за этого мерж апстрима даёт конфликт modify/delete по `AGENTS.md`: апстрим файл
+  правит, у нас его нет. Разрешать так: `git rm AGENTS.md`, а полезные изменения из
+  апстримовой версии переносить руками в `CLAUDE.md`. Возвращать `AGENTS.md` не надо.
+
 ## Сабагенты и ресёрч
 
 - **Гуглить/искать документацию — через сабагентов**, но ТОЛЬКО типом `Explore`: у него в
