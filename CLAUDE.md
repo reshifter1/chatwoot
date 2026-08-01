@@ -66,6 +66,9 @@
 
 - Prefer Conventional Commits: `type(scope): subject` (scope optional)
 - Example: `feat(auth): add user authentication`
+- Every commit gets pushed: right after committing, run `git push origin <current branch>`.
+  A commit left sitting unpushed doesn't count as finished work. This applies to `origin`
+  only - never push to `upstream` (the chatwoot/chatwoot repo).
 - Don't reference Claude in commit messages: no `Co-Authored-By: Claude`, no "Generated
   with Claude Code", no other assistant attribution - not in the subject, body, or as a
   trailer. Applies always, including commits the agent is asked to make explicitly where
