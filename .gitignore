@@ -92,11 +92,8 @@ yarn-debug.log*
 
 # TextEditors & AI Agents config files
 .vscode
-.claude/settings.local.json
 .cursor
 .codex/
-.claude/
-CLAUDE.local.md
 
 # Histoire deployment
 .netlify

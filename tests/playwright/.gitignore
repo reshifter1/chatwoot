@@ -32,7 +32,6 @@ traces/
 *.swo
 *~
 .DS_Store
-.claude
 
 # Logs
 *.log
