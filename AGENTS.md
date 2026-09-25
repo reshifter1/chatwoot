@@ -24,7 +24,7 @@
 - **Seed Local Test Data**: `bundle exec rails db:seed` (quickly populates minimal data for standard feature verification)
 - **Seed Search Test Data**: `bundle exec rails search:setup_test_data` (bulk fixture generation for search/performance/manual load scenarios)
 - **Seed Account Sample Data (richer test data)**: `Seeders::AccountSeeder` is available as an internal utility and is exposed through Super Admin `Accounts#seed`, but can be used directly in dev workflows too:
-  - UI path: Super Admin → Accounts → Seed (enqueues `Internal::SeedAccountJob`).
+  - UI path: Super Admin -> Accounts -> Seed (enqueues `Internal::SeedAccountJob`).
   - CLI path: `bundle exec rails runner "Internal::SeedAccountJob.perform_now(Account.find(<id>))"` (or call `Seeders::AccountSeeder.new(account: Account.find(<id>)).perform!` directly).
 - **Lint JS/Vue**: `pnpm eslint` / `pnpm eslint:fix`
 - **Lint Ruby**: `bundle exec rubocop -a`
@@ -86,10 +86,7 @@
 - Every commit gets pushed: right after committing, run `git push origin <current branch>`.
   A commit left sitting unpushed doesn't count as finished work. This applies to `origin`
   only - never push to `upstream` (the chatwoot/chatwoot repo).
-- Don't reference Claude in commit messages: no `Co-Authored-By: Claude`, no "Generated
-  with Claude Code", no other assistant attribution - not in the subject, body, or as a
-  trailer. Applies always, including commits the agent is asked to make explicitly where
-  it otherwise must not commit.
+- Do not add assistant attribution to commit messages, including `Co-Authored-By` and generated-by lines. Applies to the subject, body, and trailers.
 
 ## PR Description Format
 
@@ -105,7 +102,7 @@
 - **Translations**:
   - Only update `en.yml` and `en.json`
   - Other languages are handled by the community
-  - Backend i18n → `en.yml`, Frontend i18n → `en.json`
+  - Backend i18n -> `en.yml`, Frontend i18n -> `en.json`
 - **Frontend**:
   - Use `components-next/` for message bubbles (the rest is being deprecated)
 
@@ -135,15 +132,6 @@ Practical checklist for any change impacting core logic or public APIs
 
 - For user-facing strings that currently contain "Chatwoot" but should adapt to branded/self-hosted installs, prefer applying `replaceInstallationName` from `shared/composables/useBranding` in the UI layer (for example tooltip and suggestion labels) instead of adding hardcoded brand-specific copy.
 
-## Форк: гайдлайны только в CLAUDE.md
-
-- Апстримовый `AGENTS.md` (он есть в оригинальном chatwoot, например в теге `v4.15.1`) в
-  этом форке удалён намеренно. Единственный файл гайдлайнов - `CLAUDE.md`: это бывшее
-  содержимое `AGENTS.md` плюс наши секции. Симлинка `CLAUDE.md -> AGENTS.md` больше нет.
-- Из-за этого мерж апстрима даёт конфликт modify/delete по `AGENTS.md`: апстрим файл
-  правит, у нас его нет. Разрешать так: `git rm AGENTS.md`, а полезные изменения из
-  апстримовой версии переносить руками в `CLAUDE.md`. Возвращать `AGENTS.md` не надо.
-
 ## Сабагенты и ресёрч
 
 - **Гуглить/искать документацию — через сабагентов**, но ТОЛЬКО типом `Explore`: у него в
@@ -162,9 +150,9 @@ Practical checklist for any change impacting core logic or public APIs
   это баг промпта, а не норма. То же про собственное чтение: `Read` с `offset`/`limit` по
   нужному фрагменту вместо файла целиком, и не перечитывать уже прочитанное.
 - **Playwright MCP - параллельно с другими сессиями.** Сервер Playwright стартует на
-  каждую сессию Claude Code. Без `--isolated` профиль браузера один на каталог проекта
+  каждую сессию Codex. Без `--isolated` профиль браузера один на каталог проекта
   (`~/.cache/ms-playwright-mcp/mcp-chrome-<хеш пути>`), и вторая сессия в том же проекте
-  падает на "Browser is already in use". Поэтому в `~/.claude/settings.json` в `env`
+  падает на "Browser is already in use". Поэтому в `~/.codex/settings.json` в `env`
   стоит `PLAYWRIGHT_MCP_ISOLATED=true`: профиль у каждой сессии в памяти, и сессии любых
   проектов открывают браузер одновременно. Переменную не снимать, свой playwright-сервер
   без `--isolated` не прописывать. Видишь "Browser is already in use" - сессия стартовала
